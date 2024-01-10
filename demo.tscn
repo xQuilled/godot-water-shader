@@ -1,0 +1,88 @@
+[gd_scene load_steps=17 format=3 uid="uid://6kwn5415vvwq"]
+
+[ext_resource type="Shader" path="res://Water/water.gdshader" id="1_n1oih"]
+[ext_resource type="Texture2D" uid="uid://2fwaqawlv00c" path="res://Water/WaterNormal.jpg" id="2_vh71c"]
+[ext_resource type="Texture2D" uid="uid://dpe04ut1u0qcg" path="res://Water/WaterNormal2.tres" id="3_24rqp"]
+[ext_resource type="Texture2D" uid="uid://bagwsd8vu25tl" path="res://Water/WaterDistortion.tres" id="4_q7l4g"]
+[ext_resource type="Gradient" path="res://Water/WaterGradient.tres" id="5_c1aeq"]
+[ext_resource type="Texture2D" uid="uid://cpv8soyohpx7w" path="res://Water/WaveTexture.tres" id="6_dsfeq"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ux0lv"]
+
+[sub_resource type="Sky" id="Sky_n0f1f"]
+sky_material = SubResource("ProceduralSkyMaterial_ux0lv")
+
+[sub_resource type="Environment" id="Environment_b35ca"]
+background_mode = 2
+sky = SubResource("Sky_n0f1f")
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_sirhh"]
+gradient = ExtResource("5_c1aeq")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bjwpx"]
+render_priority = 0
+shader = ExtResource("1_n1oih")
+shader_parameter/beer_factor = 0.2
+shader_parameter/normal_map_direction = Vector2(0, 0.05)
+shader_parameter/normal_map_direction_2 = Vector2(0, 0.05)
+shader_parameter/distortion_direction = Vector2(0, -0.02)
+shader_parameter/waves_enabled = true
+shader_parameter/wave_direction = Vector2(0, 0.1)
+shader_parameter/distortion_strength = 0.15
+shader_parameter/wave_strength = 1.0
+shader_parameter/alpha_power = 0.1
+shader_parameter/refraction_start = 1.0
+shader_parameter/normal_map_start = 0.2
+shader_parameter/refraction = 0.133
+shader_parameter/refraction_enabled = true
+shader_parameter/alpha_enabled = true
+shader_parameter/roughness = 0.0
+shader_parameter/normal_map_strength = 1.0
+shader_parameter/uv_scale = Vector2(20, 20)
+shader_parameter/water_gradient = SubResource("GradientTexture1D_sirhh")
+shader_parameter/normal_map = ExtResource("2_vh71c")
+shader_parameter/normal_map_2 = ExtResource("3_24rqp")
+shader_parameter/water_distortion = ExtResource("4_q7l4g")
+shader_parameter/wave_texture = ExtResource("6_dsfeq")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_qhcri"]
+material = SubResource("ShaderMaterial_bjwpx")
+size = Vector2(400, 400)
+subdivide_width = 20
+subdivide_depth = 20
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_utqym"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_cc6sp"]
+width = 1024
+height = 1024
+seamless = true
+as_normal_map = true
+noise = SubResource("FastNoiseLite_utqym")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_abekt"]
+albedo_color = Color(0.741176, 0.592157, 0.32549, 1)
+roughness = 0.8
+normal_enabled = true
+normal_texture = SubResource("NoiseTexture2D_cc6sp")
+uv1_scale = Vector3(5, 5, 5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_qbc1o"]
+material = SubResource("StandardMaterial3D_abekt")
+size = Vector3(400, 1, 400)
+
+[node name="demo" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_b35ca")
+
+[node name="Water" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -200)
+mesh = SubResource("PlaneMesh_qhcri")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.996195, 0.0871557, 0, -0.0871557, 0.996195, 0, 0, 0)
+mesh = SubResource("BoxMesh_qbc1o")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 13)
